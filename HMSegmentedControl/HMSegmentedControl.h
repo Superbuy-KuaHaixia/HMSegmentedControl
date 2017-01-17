@@ -14,6 +14,7 @@ typedef void (^IndexChangeBlock)(NSInteger index);
 typedef NSAttributedString *(^HMTitleFormatterBlock)(HMSegmentedControl *segmentedControl, NSString *title, NSUInteger index, BOOL selected);
 
 typedef NS_ENUM(NSInteger, HMSegmentedControlSelectionStyle) {
+    HMSegmentedControlSelectionStyleCustom, // default width 10 
     HMSegmentedControlSelectionStyleTextWidthStripe, // Indicator width will only be as big as the text width
     HMSegmentedControlSelectionStyleFullWidthStripe, // Indicator width will fill the whole segment
     HMSegmentedControlSelectionStyleBox, // A rectangle that covers the whole segment
@@ -86,21 +87,14 @@ typedef NS_ENUM(NSInteger, HMSegmentedControlType) {
  
  Default is `[UIColor whiteColor]`
  */
-@property (nonatomic, strong) UIColor *backgroundColor UI_APPEARANCE_SELECTOR;
+@property (nonatomic, strong) UIColor *hmBackgroundColor UI_APPEARANCE_SELECTOR;
 
 /**
- Color for the selection indicator stripe
+ Color for the selection indicator stripe/box
  
  Default is `R:52, G:181, B:229`
  */
 @property (nonatomic, strong) UIColor *selectionIndicatorColor UI_APPEARANCE_SELECTOR;
-
-/**
- Color for the selection indicator box
- 
- Default is selectionIndicatorColor
- */
-@property (nonatomic, strong) UIColor *selectionIndicatorBoxColor UI_APPEARANCE_SELECTOR;
 
 /**
  Color for the vertical divider between segments.

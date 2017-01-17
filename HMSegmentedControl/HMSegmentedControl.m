@@ -120,6 +120,7 @@
     [super awakeFromNib];
     
     self.segmentWidth = 0.0f;
+    [self commonInit];
 }
 
 - (void)commonInit {
@@ -129,11 +130,10 @@
     self.scrollView.showsHorizontalScrollIndicator = NO;
     [self addSubview:self.scrollView];
     
-    _backgroundColor = [UIColor whiteColor];
+    _hmBackgroundColor = [UIColor whiteColor];
     self.opaque = NO;
     _selectionIndicatorColor = [UIColor colorWithRed:52.0f/255.0f green:181.0f/255.0f blue:229.0f/255.0f alpha:1.0f];
-    _selectionIndicatorBoxColor = _selectionIndicatorColor;
-
+    
     self.selectedSegmentIndex = 0;
     self.segmentEdgeInset = UIEdgeInsetsMake(0, 5, 0, 5);
     self.selectionIndicatorHeight = 5.0f;
@@ -178,14 +178,12 @@
     _sectionTitles = sectionTitles;
     
     [self setNeedsLayout];
-    [self setNeedsDisplay];
 }
 
 - (void)setSectionImages:(NSArray *)sectionImages {
     _sectionImages = sectionImages;
     
     [self setNeedsLayout];
-    [self setNeedsDisplay];
 }
 
 - (void)setSelectionIndicatorLocation:(HMSegmentedControlSelectionIndicatorLocation)selectionIndicatorLocation {
@@ -222,7 +220,6 @@
     if (index >= self.sectionTitles.count) {
         return CGSizeZero;
     }
-    
     id title = self.sectionTitles[index];
     CGSize size = CGSizeZero;
     BOOL selected = (index == self.selectedSegmentIndex) ? YES : NO;
@@ -267,15 +264,15 @@
 }
 
 - (void)drawRect:(CGRect)rect {
-    [self.backgroundColor setFill];
+    [self.hmBackgroundColor setFill];
     UIRectFill([self bounds]);
     
     self.selectionIndicatorArrowLayer.backgroundColor = self.selectionIndicatorColor.CGColor;
     
     self.selectionIndicatorStripLayer.backgroundColor = self.selectionIndicatorColor.CGColor;
     
-    self.selectionIndicatorBoxLayer.backgroundColor = self.selectionIndicatorBoxColor.CGColor;
-    self.selectionIndicatorBoxLayer.borderColor = self.selectionIndicatorBoxColor.CGColor;
+    self.selectionIndicatorBoxLayer.backgroundColor = self.selectionIndicatorColor.CGColor;
+    self.selectionIndicatorBoxLayer.borderColor = self.selectionIndicatorColor.CGColor;
     
     // Remove all sublayers to avoid drawing images over existing ones
     self.scrollView.layer.sublayers = nil;
@@ -477,7 +474,7 @@
     // Background layer
     CALayer *backgroundLayer = [CALayer layer];
     backgroundLayer.frame = fullRect;
-    [self.layer insertSublayer:backgroundLayer atIndex:0];
+    [self.scrollView.layer insertSublayer:backgroundLayer atIndex:0];
     
     // Border layer
     if (self.borderType & HMSegmentedControlBorderTypeTop) {
@@ -573,6 +570,12 @@
         
         CGFloat x = widthToStartOfSelectedIndex + ((widthToEndOfSelectedSegment - widthToStartOfSelectedIndex) / 2) - (self.selectionIndicatorHeight/2);
         return CGRectMake(x - (self.selectionIndicatorHeight / 2), indicatorYOffset, self.selectionIndicatorHeight * 2, self.selectionIndicatorHeight);
+    } else if (self.selectionStyle == HMSegmentedControlSelectionStyleCustom) {
+        CGFloat widthToEndOfSelectedSegment = (self.segmentWidth * self.selectedSegmentIndex) + self.segmentWidth;
+        CGFloat widthToStartOfSelectedIndex = (self.segmentWidth * self.selectedSegmentIndex);
+        CGFloat x = ((widthToEndOfSelectedSegment - widthToStartOfSelectedIndex) / 2) + (widthToStartOfSelectedIndex - sectionWidth / 2);
+        CGFloat edgeLeft = (sectionWidth - self.selectionIndicatorEdgeInsets.right - 10) * 0.5;
+        return CGRectMake(x + self.selectionIndicatorEdgeInsets.left + edgeLeft, indicatorYOffset - 5, 10, self.selectionIndicatorHeight);
     } else {
         if (self.selectionStyle == HMSegmentedControlSelectionStyleTextWidthStripe &&
             sectionWidth <= self.segmentWidth &&
